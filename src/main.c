@@ -28,11 +28,11 @@ void printBall(int nextX, int nextY)
 void printObstacle(int nextX, int nextY)
 {
     screenSetColor(RED, BLACK);
-    /* Limpa a linha vertical anterior do obstáculo
-    for (int i = MINY; i <= MAXY+1; i++) {
-        screenGotoxy(i, i);
+    //Limpa a linha vertical anterior do obstáculo
+    for (int i = MINY; i <= MAXY; i++) {
+        screenGotoxy(obstacleX, i);
         printf(" ");
-    }*/
+    }
     screenGotoxy(obstacleX, obstacleY);
     printf(" ");
 
@@ -54,7 +54,7 @@ int main()
 
     // Definir fundo preto
     screenSetColor(BLACK, BLACK);
-    for (int i = MINY; i <= MAXY; i++)
+    for (int i = MINY; i <= MAXY+1; i++)
     {
         for (int j = MINX; j <= MAXX; j++)
         {
@@ -115,7 +115,7 @@ int main()
             if (obstacleY >= MAXY)
             {
                 printObstacle(obstacleX, obstacleY);
-                screenUpdate();
+                
                 // Reposicionar o obstáculo para uma nova posição aleatória no topo da tela
                 obstacleX = rand() % (MAXX - MINX - 1) + MINX;
                 obstacleY = MINY;
