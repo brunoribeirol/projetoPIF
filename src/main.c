@@ -16,6 +16,34 @@ int obstacleY = MINY; // Posição Y inicial do obstáculo
 
 int score = 0; // Variável de pontuação
 
+#define MAX_PLAYERS 100
+#define NAME_SIZE 100
+
+typedef struct {
+    char name[NAME_SIZE];
+    int score;
+} PlayerScore;
+
+void displayRanking() {
+    FILE *file = fopen("scores.txt", "r");
+    if (file == NULL) {
+        printf("Não foi possível abrir o arquivo de pontuações.\n");
+        return;
+    }
+
+    PlayerScore scores[MAX_PLAYERS];
+    int count = 0;
+    while (fscanf(file, "%99s: %d", scores[count].name, &scores[count].score) == 2) {
+        count++;
+        if (count >= MAX_PLAYERS) break;
+    }
+    fclose(file);
+
+    printf("\nRanking:\n");
+    for (int i = 0; i < count; i++) {
+        printf("%s: %d\n", scores[i].name, scores[i].score);
+    }
+}
 
 void printBall(int nextX, int nextY)
 {
@@ -57,10 +85,13 @@ void displayScore() {
     printf("Score: %d", score);
 }
 
-
-
 int main()
 {
+    char playerName[100]; // Para armazenar o nome do jogador
+    printf("Digite seu nome: ");
+    fgets(playerName, 100, stdin); // Lê o nome do jogador
+    playerName[strcspn(playerName, "\n")] = 0;
+
     static int ch = 0;
 
     screenInit(0); // Não desenha bordas
@@ -146,7 +177,7 @@ int main()
             // Verificar colisão com obstáculo
             if (newBallX == obstacleX && ballY == obstacleY)
             {
-                break; // Inverte a direção ao colidir com o obstáculo
+                break; 
             }
 
             displayScore();
@@ -156,9 +187,20 @@ int main()
         }
     }
 
+    FILE *file = fopen("scores.txt", "a"); // Abre o arquivo para adicionar a pontuação
+    if (file != NULL) {
+        fprintf(file, "%s: %d\n", playerName, score); // Escreve o nome do jogador e a pontuação
+        fclose(file); // Fecha o arquivo
+    } else {
+        printf("Não foi possível abrir o arquivo de pontuações.\n");
+    }
+    
+
     keyboardDestroy();
     screenDestroy();
     timerDestroy();
+
+    displayRanking();
 
     return 0;
 }
