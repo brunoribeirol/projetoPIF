@@ -114,19 +114,25 @@ int main()
             // Verificar se o obstáculo atingiu o limite inferior da tela
             if (obstacleY >= MAXY)
             {
-                printObstacle(obstacleX, obstacleY);
-                
+                // Limpa a posição anterior do obstáculo
+                screenGotoxy(obstacleX, obstacleY);
+                printf(" ");
+
                 // Reposicionar o obstáculo para uma nova posição aleatória no topo da tela
                 obstacleX = rand() % (MAXX - MINX - 1) + MINX;
                 obstacleY = MINY;
             }
-
+            else
+            {
+                // Se o obstáculo não atingiu o limite inferior, desenhe-o
+                printObstacle(obstacleX, obstacleY);
+            
+            }
             // Verificar colisão com obstáculo
             if (newBallX == obstacleX && ballY == obstacleY)
             {
                 break; // Inverte a direção ao colidir com o obstáculo
             }
-
             printBall(newBallX, ballY);
             printObstacle(obstacleX, obstacleY);
             screenUpdate();
