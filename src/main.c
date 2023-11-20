@@ -29,7 +29,7 @@ void printObstacle(int nextX, int nextY)
 {
     screenSetColor(RED, BLACK);
     //Limpa a linha vertical anterior do obstáculo
-    for (int i = MINY; i <= MAXY; i++) {
+    for (int i = MINY-1; i <= MAXY; i++) {
         screenGotoxy(obstacleX, i);
         printf(" ");
     }
@@ -112,20 +112,23 @@ int main()
             
 
             // Verificar se o obstáculo atingiu o limite inferior da tela
-            if (obstacleY >= MAXY)
+            if (obstacleY > MAXY)
             {
-                // Limpa a posição anterior do obstáculo
-                screenGotoxy(obstacleX, obstacleY);
-                printf(" ");
+                // Limpa a posição atual do obstáculo
+                for (int i = MINY-1; i <= MAXY; i++) {
+                    screenGotoxy(obstacleX, i);
+                    printf(" ");
+                }
 
-                // Reposicionar o obstáculo para uma nova posição aleatória no topo da tela
+                // Reposiciona o obstáculo
                 obstacleX = rand() % (MAXX - MINX - 1) + MINX;
                 obstacleY = MINY;
             }
             else
             {
                 // Se o obstáculo não atingiu o limite inferior, desenhe-o
-                printObstacle(obstacleX, obstacleY);
+                screenGotoxy(obstacleX, obstacleY);
+                printf(" ");
             
             }
             // Verificar colisão com obstáculo
