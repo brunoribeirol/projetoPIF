@@ -8,11 +8,14 @@
 #define OBSTACLE '#'
 
 int ballX, ballY; // Posição inicial da bola
-int ballSpeed = 1; // Velocidade da bola
+int ballSpeed = 2; // Velocidade da bola
 int ballDirection = 0; // Direção da bola (0 para parada, 1 para direita, -1 para esquerda)
 
 int obstacleX = 20; // Posição X do obstáculo
-int obstacleY = MAXY-24; // Posição Y inicial do obstáculo
+int obstacleY = MINY; // Posição Y inicial do obstáculo
+
+int score = 0; // Variável de pontuação
+
 
 void printBall(int nextX, int nextY)
 {
@@ -45,6 +48,16 @@ void printObstacle(int nextX, int nextY)
     printf("%c", OBSTACLE);
 }
 
+void displayScore() {
+    int scorePosX = MAXX - 10; // Ajuste conforme necessário
+    int scorePosY = MINY;
+
+    screenSetColor(YELLOW, BLACK); // Escolha a cor desejada
+    screenGotoxy(scorePosX, scorePosY);
+    printf("Score: %d", score);
+}
+
+
 
 int main()
 {
@@ -74,6 +87,7 @@ int main()
     printObstacle(obstacleX, obstacleY);
     screenUpdate();
     timerInit(100);
+    
     while (ch != 10) // Enter
     {
         // Handle user input
@@ -94,7 +108,7 @@ int main()
 
             screenUpdate();
         }
-
+        
         // Update game state (verificar colisões, etc)
         if (timerTimeOver() == 1)
         {
@@ -109,8 +123,7 @@ int main()
 
             // Movimentar o obstáculo para baixo
             obstacleY++;
-            
-
+        
             // Verificar se o obstáculo atingiu o limite inferior da tela
             if (obstacleY > MAXY)
             {
@@ -123,9 +136,8 @@ int main()
                 // Reposiciona o obstáculo
                 obstacleX = rand() % (MAXX - MINX - 1) + MINX;
                 obstacleY = MINY;
-            }
-            else
-            {
+                score++; // Score de acordo com a quantidade de obstáculos desviados
+            } else {
                 // Se o obstáculo não atingiu o limite inferior, desenhe-o
                 screenGotoxy(obstacleX, obstacleY);
                 printf(" ");
@@ -136,6 +148,8 @@ int main()
             {
                 break; // Inverte a direção ao colidir com o obstáculo
             }
+
+            displayScore();
             printBall(newBallX, ballY);
             printObstacle(obstacleX, obstacleY);
             screenUpdate();
