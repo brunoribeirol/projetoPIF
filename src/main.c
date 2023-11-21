@@ -27,6 +27,7 @@ typedef struct PlayerScore {
     struct PlayerScore *next; 
 } PlayerScore;
 
+
 void displayRanking() {
     FILE *file = fopen("scores.txt", "r");
     if (file == NULL) {
@@ -45,27 +46,41 @@ void displayRanking() {
 
         newNode->next = head; 
         head = newNode;       
-        }
+    }
 
     fclose(file);
 
+    // Ordenar a lista encadeada por score
+    PlayerScore *lista_ordenada = NULL;
+    while (head != NULL) {
+        PlayerScore *atual = head;
+        head = head->next;
+       
+        if (lista_ordenada == NULL || atual->score > lista_ordenada->score) {
+            atual->next = lista_ordenada;
+            lista_ordenada = atual;
+        } else {
+            PlayerScore *temp = lista_ordenada;
+            while (temp->next != NULL && atual->score <= temp->next->score) {
+                temp = temp->next;
+            }
+            atual->next = temp->next;
+            temp->next = atual;
+        }
+    }
+
     printf("\nRanking:\n");
     int i = 1;
-    PlayerScore *atual = head;
+    PlayerScore *atual = lista_ordenada;
     while (atual != NULL) {
         printf("%d- %s = %d\n", i, atual->name, atual->score);
         i++;
-        atual = atual->next;
-    }
-
-    // Libera a memória alocada para a lista encadeada
-    atual = head;
-    while (atual != NULL) {
         PlayerScore *temp = atual;
         atual = atual->next;
-        free(temp);
+        free(temp);  // Libera a memória alocada para a lista encadeada ordenada
     }
 }
+
 
 
 void printBall(int nextX, int nextY)
