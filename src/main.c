@@ -19,9 +19,12 @@ int score = 0; // Variável de pontuação
 #define MAX_PLAYERS 100
 #define NAME_SIZE 20
 
+
+
 typedef struct PlayerScore {
     char name[NAME_SIZE];
     int score;
+    struct PlayerScore *next; 
 } PlayerScore;
 
 void displayRanking() {
@@ -31,24 +34,39 @@ void displayRanking() {
         return;
     }
 
-    PlayerScore scores[MAX_PLAYERS];
-    int count = 0;
-    while(1)
-    {
-        fscanf(file, "%s: %d", scores[count].name, &scores[count].score);
-        count++;
-        if (count >= MAX_PLAYERS) {
+    PlayerScore *head = NULL;  
+
+    while (1) {
+        PlayerScore *newNode = (PlayerScore *)malloc(sizeof(PlayerScore));
+        if (fscanf(file, "%s %d", newNode->name, &newNode->score) != 2) {
+            free(newNode);
             break;
         }
-    }
 
-    printf("\nRanking:\n");
-    for (int i = 0; i < count; i++) {
-    printf("%d- %s = %d\n", i + 1, scores[i].name, scores[i].score);
-    }
+        newNode->next = head; 
+        head = newNode;       
+        }
 
     fclose(file);
+
+    printf("\nRanking:\n");
+    int i = 1;
+    PlayerScore *atual = head;
+    while (atual != NULL) {
+        printf("%d- %s = %d\n", i, atual->name, atual->score);
+        i++;
+        atual = atual->next;
+    }
+
+    // Libera a memória alocada para a lista encadeada
+    atual = head;
+    while (atual != NULL) {
+        PlayerScore *temp = atual;
+        atual = atual->next;
+        free(temp);
+    }
 }
+
 
 void printBall(int nextX, int nextY)
 {
