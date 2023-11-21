@@ -28,47 +28,90 @@ typedef struct PlayerScore {
     struct PlayerScore *next; 
 } PlayerScore;
 
+void cRun();
+void menu();
+void printBall(int nextX, int nextY);
+void printObstacle(int nextX, int nextY);
+void game();
+void displayScore();
+void displayRanking();
 
-void displayRanking() {
-    FILE *file = fopen("scores.txt", "r");
-    if (file == NULL) {
-        printf("Não foi possível abrir o arquivo de pontuações.\n");
-        return;
+int main()
+{
+    printf("Bem-Vindos ao C->Run!\n");
+
+    menu();
+
+    int choice;
+
+    printf("Escolha a opção que deseja realizar: ");
+    scanf("%d", &choice);
+    if (choice == 1)
+    {
+        game();
     }
-
-    PlayerScore *head = NULL;  
-
-    while (1) {
-        PlayerScore *newNode = (PlayerScore *)malloc(sizeof(PlayerScore));
-        if (fscanf(file, "%s %d", newNode->name, &newNode->score) != 2) {
-            free(newNode);
-            break;
-        }
-
-        newNode->next = head; 
-        head = newNode;       
-        }
-
-    fclose(file);
-
-    printf("\nRanking:\n");
-    int i = 1;
-    PlayerScore *atual = head;
-    while (atual != NULL) {
-        printf("%d- %s = %d\n", i, atual->name, atual->score);
-        i++;
-        atual = atual->next;
+    else if (choice == 2)
+    {
+        displayRanking();
     }
-
-    // Libera a memória alocada para a lista encadeada
-    atual = head;
-    while (atual != NULL) {
-        PlayerScore *temp = atual;
-        atual = atual->next;
-        free(temp);
+    else if (choice == 3)
+    {
+        return 0; //Encerra o programa, ou mudar para switch-case
     }
+    else
+    {
+        printf("Opção inválida, por favor insira um número válido!");
+    }
+    
+    return 0;
 }
 
+/*
+void cRun()
+{
+    printf(
+        "  ##                                            ##                  ##\n"
+        "  ##                                                                ##\n"
+        "  ##       ####    ##  ##            ##  ##    ###     #####        ##    ####\n"
+        "  #####   ##  ##   #######           ##  ##     ##     ##  ##    #####   ##  ##\n"
+        "  ##  ##  ######   ## # ##           ##  ##     ##     ##  ##   ##  ##   ##  ##\n"
+        "  ##  ##  ##       ##   ##            ####      ##     ##  ##   ##  ##   ##  ##\n"
+        " ######    #####   ##   ##             ##      ####    ##  ##    ######   ####\n"
+        );
+    
+    fflush(stdout);
+    sleep(2);
+    clearScreen();
+
+    printf(
+        " ####     ####\n"
+        "    ##   ##  ##\n"
+        " #####   ##  ##\n"
+        " ##  ##   ##  ##\n"
+        " #####    ####\n"
+        );
+
+    fflush(stdout);
+    sleep(2);
+    clearScreen();
+
+    printf(
+        "  ####             ######   ##  ##   #####\n"
+        " ##  ##             ##  ##  ##  ##   ##  ##\n"
+        " ##                 ##      ##  ##   ##  ##\n"
+        " ##  ##             ##      ##  ##   ##  ##\n"
+        "  ####             ####      ######  ##  ##\n"
+        );   
+}
+*/
+
+void menu()
+{
+    printf("-----MENU PRINCIPAL-----\n");
+    printf("1-Jogar C->RUN\n");
+    printf("2-Visualizar Ranking\n");
+    printf("3-Sair\n");
+}
 
 void printBall(int nextX, int nextY)
 {
@@ -227,8 +270,7 @@ void displayScore()
     printf("Score: %d", score);
 }
 
-void displayRanking()
-{
+void displayRanking() {
     FILE *file = fopen("scores.txt", "r");
     if (file == NULL) {
         printf("Não foi possível abrir o arquivo de pontuações.\n");
@@ -250,9 +292,28 @@ void displayRanking()
 
     fclose(file);
 
+    // Ordenar a lista encadeada por score
+    PlayerScore *lista_ordenada = NULL;
+    while (head != NULL) {
+        PlayerScore *atual = head;
+        head = head->next;
+       
+        if (lista_ordenada == NULL || atual->score > lista_ordenada->score) {
+            atual->next = lista_ordenada;
+            lista_ordenada = atual;
+        } else {
+            PlayerScore *temp = lista_ordenada;
+            while (temp->next != NULL && atual->score <= temp->next->score) {
+                temp = temp->next;
+            }
+            atual->next = temp->next;
+            temp->next = atual;
+        }
+    }
+
     printf("\nRanking:\n");
     int i = 1;
-    PlayerScore *atual = head;
+    PlayerScore *atual = lista_ordenada;
     while (atual != NULL) {
         printf("%d- %s = %d\n", i, atual->name, atual->score);
         i++;

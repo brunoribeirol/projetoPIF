@@ -5,3 +5,4 @@ hj: 1
 bruno: 1
 vini: 7
 hy: 1
+: 0
