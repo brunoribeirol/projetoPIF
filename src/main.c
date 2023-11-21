@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <unistd.h> //REMOVER??? sleep
+
 #include "screen.h"
 #include "keyboard.h"
 #include "timer.h"
@@ -19,54 +22,60 @@ int score = 0; // Variável de pontuação
 #define MAX_PLAYERS 100
 #define NAME_SIZE 20
 
-
-
 typedef struct PlayerScore {
     char name[NAME_SIZE];
     int score;
     struct PlayerScore *next; 
 } PlayerScore;
 
-void displayRanking() {
-    FILE *file = fopen("scores.txt", "r");
-    if (file == NULL) {
-        printf("Não foi possível abrir o arquivo de pontuações.\n");
-        return;
+void cRun();
+void menu();
+void printBall(int nextX, int nextY);
+void printObstacle(int nextX, int nextY);
+void game();
+void displayScore();
+void displayRanking();
+
+
+
+int main()
+{
+    printf("Bem vindos ao C->RUN\n");
+
+    menu();
+
+    int choice;
+
+    printf("Escolha a opção que deseja realizar: ");
+    scanf("%d", &choice);
+
+    if (choice == 1)
+    {
+        game();
     }
-
-    PlayerScore *head = NULL;  
-
-    while (1) {
-        PlayerScore *newNode = (PlayerScore *)malloc(sizeof(PlayerScore));
-        if (fscanf(file, "%s %d", newNode->name, &newNode->score) != 2) {
-            free(newNode);
-            break;
-        }
-
-        newNode->next = head; 
-        head = newNode;       
-        }
-
-    fclose(file);
-
-    printf("\nRanking:\n");
-    int i = 1;
-    PlayerScore *atual = head;
-    while (atual != NULL) {
-        printf("%d- %s = %d\n", i, atual->name, atual->score);
-        i++;
-        atual = atual->next;
+    else if (choice == 2)
+    {
+        displayRanking();
     }
-
-    // Libera a memória alocada para a lista encadeada
-    atual = head;
-    while (atual != NULL) {
-        PlayerScore *temp = atual;
-        atual = atual->next;
-        free(temp);
+    else if (choice == 3)
+    {
+        return 0; //Encerra o programa, ou mudar para switch-case
     }
+    else
+    {
+        printf("Opção inválida, por favor insira um número válido!");
+    }
+    
+    return 0;
 }
 
+void menu()
+{
+    printf("-----MENU PRINCIPAL-----\n");
+    printf("1-Jogar C->RUN\n");
+    printf("2-Visualizar Ranking\n");
+    printf("3-Sair\n");
+}
 
 void printBall(int nextX, int nextY)
 {
@@ -99,16 +108,7 @@ void printObstacle(int nextX, int nextY)
     printf("%c", OBSTACLE);
 }
 
-void displayScore() {
-    int scorePosX = MAXX - 10; // Ajuste conforme necessário
-    int scorePosY = MINY;
-
-    screenSetColor(YELLOW, BLACK); // Escolha a cor desejada
-    screenGotoxy(scorePosX, scorePosY);
-    printf("Score: %d", score);
-}
-
-int main()
+void game()
 {
     char playerName[100]; // Para armazenar o nome do jogador
     printf("Digite seu nome: ");
@@ -222,8 +222,55 @@ int main()
     keyboardDestroy();
     screenDestroy();
     timerDestroy();
+}
 
-    displayRanking();
+void displayScore()
+{
+    int scorePosX = MAXX - 10; // Ajuste conforme necessário
+    int scorePosY = MINY;
 
-    return 0;
+    screenSetColor(YELLOW, BLACK); // Escolha a cor desejada
+    screenGotoxy(scorePosX, scorePosY);
+    printf("Score: %d", score);
+}
+
+void displayRanking()
+{
+    FILE *file = fopen("scores.txt", "r");
+    if (file == NULL) {
+        printf("Não foi possível abrir o arquivo de pontuações.\n");
+        return;
+    }
+
+    PlayerScore *head = NULL;  
+
+    while (1) {
+        PlayerScore *newNode = (PlayerScore *)malloc(sizeof(PlayerScore));
+        if (fscanf(file, "%s %d", newNode->name, &newNode->score) != 2) {
+            free(newNode);
+            break;
+        }
+
+        newNode->next = head; 
+        head = newNode;       
+        }
+
+    fclose(file);
+
+    printf("\nRanking:\n");
+    int i = 1;
+    PlayerScore *atual = head;
+    while (atual != NULL) {
+        printf("%d- %s = %d\n", i, atual->name, atual->score);
+        i++;
+        atual = atual->next;
+    }
+
+    // Libera a memória alocada para a lista encadeada
+    atual = head;
+    while (atual != NULL) {
+        PlayerScore *temp = atual;
+        atual = atual->next;
+        free(temp);
+    }
 }
