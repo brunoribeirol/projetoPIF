@@ -28,54 +28,47 @@ typedef struct PlayerScore {
     struct PlayerScore *next; 
 } PlayerScore;
 
-void cRun();
-void menu();
-void printBall(int nextX, int nextY);
-void printObstacle(int nextX, int nextY);
-void game();
-void displayScore();
-void displayRanking();
 
-
-
-int main()
-{
-    printf("Bem vindos ao C->RUN\n");
-
-    menu();
-
-    int choice;
-
-    printf("Escolha a opção que deseja realizar: ");
-    scanf("%d", &choice);
-
-    if (choice == 1)
-    {
-        game();
+void displayRanking() {
+    FILE *file = fopen("scores.txt", "r");
+    if (file == NULL) {
+        printf("Não foi possível abrir o arquivo de pontuações.\n");
+        return;
     }
-    else if (choice == 2)
-    {
-        displayRanking();
+
+    PlayerScore *head = NULL;  
+
+    while (1) {
+        PlayerScore *newNode = (PlayerScore *)malloc(sizeof(PlayerScore));
+        if (fscanf(file, "%s %d", newNode->name, &newNode->score) != 2) {
+            free(newNode);
+            break;
+        }
+
+        newNode->next = head; 
+        head = newNode;       
+        }
+
+    fclose(file);
+
+    printf("\nRanking:\n");
+    int i = 1;
+    PlayerScore *atual = head;
+    while (atual != NULL) {
+        printf("%d- %s = %d\n", i, atual->name, atual->score);
+        i++;
+        atual = atual->next;
     }
-    else if (choice == 3)
-    {
-        return 0; //Encerra o programa, ou mudar para switch-case
+
+    // Libera a memória alocada para a lista encadeada
+    atual = head;
+    while (atual != NULL) {
+        PlayerScore *temp = atual;
+        atual = atual->next;
+        free(temp);
     }
-    else
-    {
-        printf("Opção inválida, por favor insira um número válido!");
-    }
-    
-    return 0;
 }
 
-void menu()
-{
-    printf("-----MENU PRINCIPAL-----\n");
-    printf("1-Jogar C->RUN\n");
-    printf("2-Visualizar Ranking\n");
-    printf("3-Sair\n");
-}
 
 void printBall(int nextX, int nextY)
 {
