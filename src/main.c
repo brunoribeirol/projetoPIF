@@ -17,9 +17,9 @@ int obstacleY = MINY; // Posição Y inicial do obstáculo
 int score = 0; // Variável de pontuação
 
 #define MAX_PLAYERS 100
-#define NAME_SIZE 100
+#define NAME_SIZE 20
 
-typedef struct {
+typedef struct PlayerScore {
     char name[NAME_SIZE];
     int score;
 } PlayerScore;
@@ -33,16 +33,21 @@ void displayRanking() {
 
     PlayerScore scores[MAX_PLAYERS];
     int count = 0;
-    while (fscanf(file, "%99s: %d", scores[count].name, &scores[count].score) == 2) {
+    while(1)
+    {
+        fscanf(file, "%s: %d", scores[count].name, &scores[count].score);
         count++;
-        if (count >= MAX_PLAYERS) break;
+        if (count >= MAX_PLAYERS) {
+            break;
+        }
     }
-    fclose(file);
 
     printf("\nRanking:\n");
     for (int i = 0; i < count; i++) {
-        printf("%s: %d\n", scores[i].name, scores[i].score);
+    printf("%d- %s = %d\n", i + 1, scores[i].name, scores[i].score);
     }
+
+    fclose(file);
 }
 
 void printBall(int nextX, int nextY)
