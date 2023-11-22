@@ -51,18 +51,13 @@
   </li>
   <li>
     <a href="https://github.com/Victorgalves">Victor Guilherme</a> -
-    jprda@cesar.school 📩
+    vgac@cesar.school 📩
   </li>
   <li>
     <a href="https://github.com/vinipetribu">Vinícius Petribu</a> -
     vclp@cesar.school 📩
   </li>
 </ul>
-
-<h2>Contribuíntes 👨‍👩‍👧‍👦</h2>
-<a href="https://github.com/brunoribeirol/projetoPIF/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=brunoribeirol/projetoPIF" />
-</a>
 
 <h2>Notas Adicionais</h2>
 <ul>
