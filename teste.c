@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include "timer.h"
+
 void clearScreen() {
     #ifdef _WIN32
         system("cls");
@@ -26,7 +28,7 @@ void cRun()
     
     fflush(stdout);
     sleep(2);
-    clearScreen();
+    timerDestroy();
 
     printf(
         " ####     ####\n"
@@ -38,7 +40,7 @@ void cRun()
 
     fflush(stdout);
     sleep(2);
-    clearScreen();
+    timerDestroy();
 
     printf(
         "  ####             ######   ##  ##   #####\n"

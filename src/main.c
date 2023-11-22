@@ -8,20 +8,16 @@
 #include "keyboard.h"
 #include "timer.h"
 
-#define OBSTACLE "#"
-
 #define RED_BG "\e[41m"
 #define BOLD_YEL "\e[1;33m"
 #define BLU "\e[0;34m"
 #define GRN "\e[0;32m"
 #define CYN "\e[0;36m"
-
+#define UMAG "\e[4;35m"
+#define BLK "\e[0;30m"
 #define reset "\e[0m"
 
-#define UMAG "\e[4;35m"
-
-#define BLK "\e[0;30m"
-
+#define OBSTACLE "#"
 
 int ballX, ballY; // Posição inicial da bola
 int ballSpeed = 2; // Velocidade da bola
@@ -51,7 +47,7 @@ void displayRanking();
 
 int main()
 {
-    printf("Bem-Vindos ao C->Run!\n");
+    //cRun();
 
     while (1)
     {
@@ -87,7 +83,6 @@ int main()
     return 0;
 }
 
-
 /*
 void cRun()
 {
@@ -102,8 +97,7 @@ void cRun()
         );
     
     fflush(stdout);
-    sleep(2);
-    clearScreen();
+    screenDestroy(); //Nao ta pegando
 
     printf(
         " ####     ####\n"
@@ -114,8 +108,7 @@ void cRun()
         );
 
     fflush(stdout);
-    sleep(2);
-    clearScreen();
+    screenDestroy(); //Nao ta pegando
 
     printf(
         "  ####             ######   ##  ##   #####\n"
@@ -126,6 +119,7 @@ void cRun()
         );   
 }
 */
+
 void menu()
 {
     printf(BOLD_YEL "\n----- MENU PRINCIPAL -----\n" reset);

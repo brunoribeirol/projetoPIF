@@ -1,20 +1,41 @@
+# Compiler
 CC = gcc
-CFLAGS = -Wall -I./include
-SRC_DIR = ./src
-OBJ_DIR = ./obj
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
+# Compiler flags
+CFLAGS = -Wall -g
 
+# Directories
+INCLUDE_DIR = include
+SRC_DIR = src
+
+# Source files
+SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/keyboard.c $(SRC_DIR)/screen.c $(SRC_DIR)/timer.c
+
+# Object files
+OBJS = $(SRCS:.c=.o)
+
+# Executable
 TARGET = projetoPIF
 
+# Include directories
+INC_DIRS = -I$(INCLUDE_DIR)
+
+# Default target
 all: $(TARGET)
 
+# Rule to build the executable
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) -o $@ $^
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
+# Rule to build object files
+%.o: %.c
+	$(CC) $(CFLAGS) $(INC_DIRS) -c -o $@ $<
 
+# Run the program
+run: $(TARGET)
+	./$(TARGET)
+
+# Clean ups
 clean:
-	rm -rf $(OBJ_DIR)/*.o $(TARGET)
+	rm -f $(OBJS) $(TARGET)
+
