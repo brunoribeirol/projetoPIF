@@ -8,7 +8,20 @@
 #include "keyboard.h"
 #include "timer.h"
 
-#define OBSTACLE '#'
+#define OBSTACLE "#"
+
+#define RED_BG "\e[41m"
+#define BOLD_YEL "\e[1;33m"
+#define BLU "\e[0;34m"
+#define GRN "\e[0;32m"
+#define CYN "\e[0;36m"
+
+#define reset "\e[0m"
+
+#define UMAG "\e[4;35m"
+
+#define BLK "\e[0;30m"
+
 
 int ballX, ballY; // Posição inicial da bola
 int ballSpeed = 2; // Velocidade da bola
@@ -40,31 +53,40 @@ int main()
 {
     printf("Bem-Vindos ao C->Run!\n");
 
-    menu();
+    while (1)
+    {
+        menu();
 
-    int choice;
+        int choice;
 
-    printf("Escolha a opção que deseja realizar: ");
-    scanf("%d", &choice);
-    if (choice == 1)
-    {
-        game();
+        printf(reset "Escolha a opção que deseja realizar: " reset);
+        if (scanf("%d", &choice) != 1)
+        {
+            printf(RED_BG "Entrada inválida. Por favor, insira um número.\n" reset);
+            // Clear the input buffer to prevent an infinite loop
+            while (getchar() != '\n');
+            continue;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                game();
+                break;
+            case 2:
+                displayRanking();
+                break;
+            case 3:
+                printf(RED_BG "Você encerrou o programa.\n" reset);
+                return 0;
+            default:
+                printf(RED_BG "Opção inválida, por favor insira um número válido!\n" reset);
+        }
     }
-    else if (choice == 2)
-    {
-        displayRanking();
-    }
-    else if (choice == 3)
-    {
-        return 0; //Encerra o programa, ou mudar para switch-case
-    }
-    else
-    {
-        printf("Opção inválida, por favor insira um número válido!");
-    }
-    
+
     return 0;
 }
+
 
 /*
 void cRun()
@@ -104,13 +126,12 @@ void cRun()
         );   
 }
 */
-
 void menu()
 {
-    printf("-----MENU PRINCIPAL-----\n");
-    printf("1-Jogar C->RUN\n");
-    printf("2-Visualizar Ranking\n");
-    printf("3-Sair\n");
+    printf(BOLD_YEL "\n----- MENU PRINCIPAL -----\n" reset);
+    printf(BLU "1. Jogar C->RUN\n" reset);
+    printf(GRN "2. Visualizar Ranking\n" reset);
+    printf(CYN "3. Sair\n" reset);
 }
 
 void printBall(int nextX, int nextY)
@@ -141,7 +162,7 @@ void printObstacle(int nextX, int nextY)
 
     // Imprime o obstáculo na nova posição
     screenGotoxy(obstacleX, obstacleY);
-    printf("%c", OBSTACLE);
+    printf("%s", OBSTACLE);
 }
 
 void game()
@@ -254,7 +275,6 @@ void game()
         printf("Não foi possível abrir o arquivo de pontuações.\n");
     }
     
-
     keyboardDestroy();
     screenDestroy();
     timerDestroy();
@@ -311,11 +331,11 @@ void displayRanking() {
         }
     }
 
-    printf("\nRanking:\n");
+    printf(UMAG "\nRanking:\n");
     int i = 1;
     PlayerScore *atual = lista_ordenada;
     while (atual != NULL) {
-        printf("%d- %s = %d\n", i, atual->name, atual->score);
+        printf(BLK "%d- %s = %d\n", i, atual->name, atual->score);
         i++;
         atual = atual->next;
     }
