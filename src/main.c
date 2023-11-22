@@ -13,8 +13,9 @@
 #define BLU "\e[0;34m"
 #define GRN "\e[0;32m"
 #define CYN "\e[0;36m"
-#define UMAG "\e[4;35m"
 #define BLK "\e[0;30m"
+#define BMAG "\e[1;35m"
+
 #define reset "\e[0m"
 
 #define OBSTACLE "💣"
@@ -49,7 +50,7 @@ void displayRanking();
 
 int main()
 {
-    //cRun();
+    cRun();
 
     while (1)
     {
@@ -83,23 +84,11 @@ int main()
     }
 
     return 0;
-}
-
-/*
+}  
+ 
 void cRun()
 {
-     // Definir fundo preto
-    screenSetColor(BLACK, BLACK);
-    for (int i = MINY; i <= MAXY+1; i++)
-    {
-        for (int j = MINX; j <= MAXX; j++)
-        {
-            screenGotoxy(j, i);
-            printf(" ");
-        }
-    }
-
-    printf(
+    printf(BMAG
         "  ##                                            ##                  ##\n"
         "  ##                                                                ##\n"
         "  ##       ####    ##  ##            ##  ##    ###     #####        ##    ####\n"
@@ -107,36 +96,27 @@ void cRun()
         "  ##  ##  ######   ## # ##           ##  ##     ##     ##  ##   ##  ##   ##  ##\n"
         "  ##  ##  ##       ##   ##            ####      ##     ##  ##   ##  ##   ##  ##\n"
         " ######    #####   ##   ##             ##      ####    ##  ##    ######   ####\n"
-        );
-    
-    fflush(stdout);
-    usleep(100000000);
+    );
 
     printf(
-        " ####     ####\n"
-        "    ##   ##  ##\n"
-        " #####   ##  ##\n"
-        " ##  ##   ##  ##\n"
-        " #####    ####\n"
-        );
-
-    fflush(stdout);
-    screenDestroy(); //Nao ta pegando
+        "                          ####     ####\n"
+        "                             ##   ##  ##\n"
+        "                          #####   ##  ##\n"
+        "                         ##  ##   ##  ##\n"
+        "                          #####    ####\n"
+    );
 
     printf(
-        "  ####             ######   ##  ##   #####\n"
-        " ##  ##             ##  ##  ##  ##   ##  ##\n"
-        " ##                 ##      ##  ##   ##  ##\n"
-        " ##  ##             ##      ##  ##   ##  ##\n"
-        "  ####             ####      ######  ##  ##\n"
-        );   
+        "                   ####             ######   ##  ##   #####\n"
+        "                   ##  ##             ##  ##  ##  ##   ##  ##\n"
+        "                   ##                 ##      ##  ##   ##  ##\n"
+        "                   ##  ##             ##      ##  ##   ##  ##\n"
+        "                   ####              ###      ######   ##  ##\n"
+    );
 }
-*/
 
 void menu()
 {
-    // reset; FALTA AJIETAR CORES QUANDO OPCAO INVALIDA E ENTRADA INVALIDA
-    
     printf(BOLD_YEL "\n----- MENU PRINCIPAL -----\n" reset);
     printf(BLU "1. Jogar C->RUN\n" reset);
     printf(GRN "2. Visualizar Ranking\n" reset);
@@ -151,7 +131,7 @@ void printBall(int nextX, int nextY)
     ballX = nextX;
     ballY = nextY;
     screenGotoxy(ballX, ballY);
-    printf(PLAYER); // O é usado para representar a bola
+    printf(PLAYER);
 }
 
 void printObstacle(int nextX, int nextY)
@@ -178,10 +158,10 @@ void game()
 {
     char playerName[100]; // Para armazenar o nome do jogador
     printf("Digite seu nome: ");
-    
+
     // Limpar o buffer de entrada
     while ((getchar()) != '\n');
-    
+
     fgets(playerName, 100, stdin); // Lê o nome do jogador
     playerName[strcspn(playerName, "\n")] = 0;
 
@@ -191,7 +171,7 @@ void game()
 
     // Definir fundo preto
     screenSetColor(BLACK, BLACK);
-    for (int i = MINY; i <= MAXY+1; i++)
+    for (int i = MINY; i <= MAXY + 1; i++)
     {
         for (int j = MINX; j <= MAXX; j++)
         {
@@ -207,11 +187,14 @@ void game()
     keyboardInit();
     timerInit(50);
 
+    int obstacleSpeed = 1;     // Velocidade inicial dos obstáculos
+    int obstacleInterval = 20; // Intervalo inicial entre os obstáculos (em timer ticks)
+
     printBall(ballX, ballY);
     printObstacle(obstacleX, obstacleY);
     screenUpdate();
     timerInit(100);
-    
+
     while (ch != 10) // Enter
     {
         // Handle user input
@@ -232,7 +215,7 @@ void game()
 
             screenUpdate();
         }
-        
+
         // Update game state (verificar colisões, etc)
         if (timerTimeOver() == 1)
         {
@@ -245,14 +228,15 @@ void game()
                 ballDirection = 0; // Parar movimento ao atingir bordas
             }
 
-            // Movimentar o obstáculo para baixo
-            obstacleY++;
-        
+            // Movimentar o obstáculo para baixo com a velocidade atualizada
+            obstacleY += obstacleSpeed;
+
             // Verificar se o obstáculo atingiu o limite inferior da tela
             if (obstacleY > MAXY)
             {
                 // Limpa a posição atual do obstáculo
-                for (int i = MINY-1; i <= MAXY; i++) {
+                for (int i = MINY - 1; i <= MAXY; i++)
+                {
                     screenGotoxy(obstacleX, i);
                     printf(" ");
                 }
@@ -261,16 +245,25 @@ void game()
                 obstacleX = rand() % (MAXX - MINX - 1) + MINX;
                 obstacleY = MINY;
                 score++; // Score de acordo com a quantidade de obstáculos desviados
-            } else {
+
+                // Ajusta a velocidade do obstáculo e o intervalo de aparecimento
+                if (score > 0 && score % 5 == 0)
+                {
+                    obstacleSpeed += 1;             // Aumenta a velocidade dos obstáculos a cada 5 pontos
+                    obstacleInterval -= (obstacleSpeed > 1) ? 1 : 0; // Reduz o intervalo com velocidade mais alta
+                }
+            }
+            else
+            {
                 // Se o obstáculo não atingiu o limite inferior, desenhe-o
                 screenGotoxy(obstacleX, obstacleY);
                 printf(" ");
-            
             }
+
             // Verificar colisão com obstáculo
             if (newBallX == obstacleX && ballY == obstacleY)
             {
-                break; 
+                break;
             }
 
             displayScore();
@@ -281,16 +274,20 @@ void game()
     }
 
     FILE *file = fopen("scores.txt", "a"); // Abre o arquivo para adicionar a pontuação
-    if (file != NULL) {
+    if (file != NULL)
+    {
         fprintf(file, "%s: %d\n", playerName, score); // Escreve o nome do jogador e a pontuação
-        fclose(file); // Fecha o arquivo
-    } else {
+        fclose(file);                                  // Fecha o arquivo
+    }
+    else
+    {
         printf("Não foi possível abrir o arquivo de pontuações.\n");
     }
-    
+
     keyboardDestroy();
     screenDestroy();
     timerDestroy();
+    displayRanking();
 }
 
 void displayScore()
@@ -303,7 +300,8 @@ void displayScore()
     printf("Score: %d", score);
 }
 
-void displayRanking() {
+void displayRanking()
+{
     FILE *file = fopen("scores.txt", "r");
     if (file == NULL) {
         printf("Não foi possível abrir o arquivo de pontuações.\n");
@@ -344,11 +342,20 @@ void displayRanking() {
         }
     }
 
-    printf(UMAG "\nRanking:\n");
+    printf(BMAG
+    "  ######     ##     ##   ##  ###  ##   ####    ##   ##    ####\n"
+    "  ##  ##   ####    ###  ##   ##  ##    ##     ###  ##   ##  ##\n"
+    "  ##  ##  ##  ##   #### ##   ## ##     ##     #### ##  ##\n"
+    "  #####   ##  ##   ## ####   ####      ##     ## ####  ##\n"
+    "  ## ##   ######   ##  ###   ## ##     ##     ##  ###  ##  ###\n"
+    "  ##  ##  ##  ##   ##   ##   ##  ##    ##     ##   ##   ##  ##\n"
+    " #### ##  ##  ##   ##   ##  ###  ##   ####    ##   ##    #####\n"
+    );
+
     int i = 1;
     PlayerScore *atual = lista_ordenada;
     while (atual != NULL) {
-        printf(BLK "%d- %s = %d\n", i, atual->name, atual->score);
+        printf(BLK "%d: %s = %d\n", i, atual->name, atual->score);
         i++;
         atual = atual->next;
     }
