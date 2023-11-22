@@ -28,7 +28,19 @@
 <h2>Instruções de Compilação e Execução:</h2>
 <pre>
     <code>
-        make
+        gcc ./src/*.c -I./include -o projetoPIF
+    </code>
+</pre>
+    <p>Seguido por: </p>
+<pre>
+    <code>
+        ./projetoPIF
+    </code>
+</pre>
+    <p>Ou simplesmente:</p>
+<pre>
+    <code>
+        make run
     </code>
 </pre>
 
@@ -58,6 +70,7 @@
     vclp@cesar.school 📩
   </li>
 </ul>
+
 
 <h2>Notas Adicionais</h2>
 <ul>
