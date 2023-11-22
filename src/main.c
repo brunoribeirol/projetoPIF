@@ -17,10 +17,12 @@
 #define BLK "\e[0;30m"
 #define reset "\e[0m"
 
-#define OBSTACLE "#"
+#define OBSTACLE "💣"
+
+#define PLAYER "⚪️"
 
 int ballX, ballY; // Posição inicial da bola
-int ballSpeed = 2; // Velocidade da bola
+int ballSpeed = 3; // Velocidade da bola
 int ballDirection = 0; // Direção da bola (0 para parada, 1 para direita, -1 para esquerda)
 
 int obstacleX = 20; // Posição X do obstáculo
@@ -86,6 +88,17 @@ int main()
 /*
 void cRun()
 {
+     // Definir fundo preto
+    screenSetColor(BLACK, BLACK);
+    for (int i = MINY; i <= MAXY+1; i++)
+    {
+        for (int j = MINX; j <= MAXX; j++)
+        {
+            screenGotoxy(j, i);
+            printf(" ");
+        }
+    }
+
     printf(
         "  ##                                            ##                  ##\n"
         "  ##                                                                ##\n"
@@ -97,7 +110,7 @@ void cRun()
         );
     
     fflush(stdout);
-    screenDestroy(); //Nao ta pegando
+    usleep(100000000);
 
     printf(
         " ####     ####\n"
@@ -122,6 +135,8 @@ void cRun()
 
 void menu()
 {
+    // reset; FALTA AJIETAR CORES QUANDO OPCAO INVALIDA E ENTRADA INVALIDA
+    
     printf(BOLD_YEL "\n----- MENU PRINCIPAL -----\n" reset);
     printf(BLU "1. Jogar C->RUN\n" reset);
     printf(GRN "2. Visualizar Ranking\n" reset);
@@ -136,7 +151,7 @@ void printBall(int nextX, int nextY)
     ballX = nextX;
     ballY = nextY;
     screenGotoxy(ballX, ballY);
-    printf("O"); // O é usado para representar a bola
+    printf(PLAYER); // O é usado para representar a bola
 }
 
 void printObstacle(int nextX, int nextY)
@@ -163,6 +178,10 @@ void game()
 {
     char playerName[100]; // Para armazenar o nome do jogador
     printf("Digite seu nome: ");
+    
+    // Limpar o buffer de entrada
+    while ((getchar()) != '\n');
+    
     fgets(playerName, 100, stdin); // Lê o nome do jogador
     playerName[strcspn(playerName, "\n")] = 0;
 
