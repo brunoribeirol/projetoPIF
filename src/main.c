@@ -155,17 +155,30 @@ void game()
 {
     char playerName[NAME_SIZE];
     printf("Digite seu nome: ");
-
-    // Limpar o buffer de entrada
+    // Limpar o buffer de entrada antes de ler o nome
     while ((getchar()) != '\n');
-
     fgets(playerName, NAME_SIZE, stdin);
     playerName[strcspn(playerName, "\n")] = 0;
 
-    static int ch = 0;
+    // Resetar a pontuação
+    score = 0;
+
+    // Resetar a posição e direção da bola
+    ballX = (MINX + MAXX) / 2;
+    ballY = MAXY;
+    ballDirection = 0; // Direção da bola inicialmente parada
+
+    // Resetar a posição e velocidade dos obstáculos
+    for (int i = 0; i < MAX_OBSTACLES; i++)
+    {
+        obstacleX[i] = rand() % (MAXX - MINX - 1) + MINX;
+        obstacleY[i] = MINY;
+        obstacleSpeed[i] = 1; // Velocidade inicial dos obstáculos
+    }
 
     screenInit(0); // Não desenha bordas
 
+    
     // Definir fundo preto
     screenSetColor(BLACK, BLACK);
     for (int i = MINY; i <= MAXY + 1; i++)
@@ -177,17 +190,7 @@ void game()
         }
     }
 
-    // Inicializar a posição da bola no meio da parte inferior da tela
-    ballX = (MINX + MAXX) / 2;
-    ballY = MAXY;
 
-    // Inicializar a posição e velocidade dos obstáculos
-    for (int i = 0; i < MAX_OBSTACLES; i++)
-    {
-        obstacleX[i] = rand() % (MAXX - MINX - 1) + MINX;
-        obstacleY[i] = MINY;
-        obstacleSpeed[i] = 1;
-    }
 
     keyboardInit();
     timerInit(50);
@@ -202,6 +205,7 @@ void game()
 
     screenUpdate();
     timerInit(100);
+    static int ch = 0;
 
     while (ch != 10) // Enter (encerra o jogo)
     {
