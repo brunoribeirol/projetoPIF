@@ -18,17 +18,20 @@
 
 #define OBSTACLE "💣"
 #define PLAYER "⚪️"
+#define MAX_OBSTACLES 5
 
 #define MAX_PLAYERS 100
 #define NAME_SIZE 20
 
 int ballX, ballY; // Posição inicial da bola
+int ballSpeed = 3;
 int ballDirection = 0; // Direção da bola (0 para parada, 1 para direita, -1 para esquerda)
-int obstacleX = 20; // Posição X do obstáculo
-int obstacleY = MINY; // Posição Y inicial do obstáculo
+
+int obstacleX[MAX_OBSTACLES]; // Posição X dos obstáculos
+int obstacleY[MAX_OBSTACLES]; // Posição Y dos obstáculos
+int obstacleSpeed[MAX_OBSTACLES]; // Velocidade dos obstáculos
 
 int score = 0; // Variável de pontuação
-
 typedef struct PlayerScore {
     char name[NAME_SIZE];
     int score;
@@ -38,10 +41,11 @@ typedef struct PlayerScore {
 void cRun();
 void menu();
 void printBall(int nextX, int nextY);
-void printObstacle(int nextX, int nextY);
+void printObstacle(int index, int nextX, int nextY);
 void game();
 void displayScore();
 void displayRanking();
+
 
 int main()
 {
@@ -129,29 +133,27 @@ void printBall(int nextX, int nextY)
     printf(PLAYER);
 }
 
-void printObstacle(int nextX, int nextY)
+void printObstacle(int index, int nextX, int nextY)
 {
-    screenSetColor(RED, BLACK);
-    //Limpa a linha vertical anterior do obstáculo
-    for (int i = MINY-1; i <= MAXY; i++) {
-        screenGotoxy(obstacleX, i);
+    // Limpa a posição atual do obstáculo
+    for (int i = MINY - 1; i <= MAXY; i++)
+    {
+        screenGotoxy(obstacleX[index], i);
         printf(" ");
     }
-    screenGotoxy(obstacleX, obstacleY);
-    printf(" ");
 
     // Atualiza as coordenadas do obstáculo para as novas coordenadas fornecidas
-    obstacleX = nextX;
-    obstacleY = nextY;
+    obstacleX[index] = nextX;
+    obstacleY[index] = nextY;
 
     // Imprime o obstáculo na nova posição
-    screenGotoxy(obstacleX, obstacleY);
+    screenGotoxy(obstacleX[index], obstacleY[index]);
     printf("%s", OBSTACLE);
 }
 
 void game()
 {
-    char playerName[MAX_PLAYERS];
+    char playerName[NAME_SIZE];
     printf("Digite seu nome: ");
 
     // Limpar o buffer de entrada
@@ -179,15 +181,25 @@ void game()
     ballX = (MINX + MAXX) / 2;
     ballY = MAXY;
 
+    // Inicializar a posição e velocidade dos obstáculos
+    for (int i = 0; i < MAX_OBSTACLES; i++)
+    {
+        obstacleX[i] = rand() % (MAXX - MINX - 1) + MINX;
+        obstacleY[i] = MINY;
+        obstacleSpeed[i] = 1;
+    }
+
     keyboardInit();
     timerInit(50);
 
-    int ballSpeed = 3; // Velocidade da bola
-    int obstacleSpeed = 1;     // Velocidade inicial dos obstáculos
-    int obstacleInterval = 20; // Intervalo inicial entre os obstáculos (em timer ticks)
-
     printBall(ballX, ballY);
-    printObstacle(obstacleX, obstacleY);
+
+    // Imprimir obstáculos iniciais
+    for (int i = 0; i < MAX_OBSTACLES; i++)
+    {
+        printObstacle(i, obstacleX[i], obstacleY[i]);
+    }
+
     screenUpdate();
     timerInit(100);
 
@@ -224,52 +236,67 @@ void game()
                 ballDirection = 0; // Parar movimento ao atingir bordas
             }
 
-            // Movimentar o obstáculo para baixo com a velocidade atualizada
-            obstacleY += obstacleSpeed;
-
-            // Verificar se o obstáculo atingiu o limite inferior da tela
-            if (obstacleY > MAXY)
+            // Movimentar os obstáculos
+            for (int i = 0; i < MAX_OBSTACLES; i++)
             {
-                // Limpa a posição atual do obstáculo
-                for (int i = MINY - 1; i <= MAXY; i++)
+                obstacleY[i] += obstacleSpeed[i];
+
+                // Verificar se a bola colidiu com algum obstáculo
+                if (newBallX >= obstacleX[i] && newBallX < (obstacleX[i] + strlen(OBSTACLE)) && ballY == obstacleY[i])
                 {
-                    screenGotoxy(obstacleX, i);
+                    printf(RED_BG "Você colidiu com um obstáculo! Fim de jogo.\n" reset);
+                    ch = 10; // Encerra o jogo
+                    break;
+                }
+
+                // Verificar se o obstáculo atingiu o limite inferior da tela
+                if (obstacleY[i] > MAXY)
+                {
+                    // Limpa a posição atual do obstáculo
+                    for (int j = MINY - 1; j <= MAXY; j++)
+                    {
+                        screenGotoxy(obstacleX[i], j);
+                        printf(" ");
+                    }
+
+                    // Reposiciona o obstáculo
+                    obstacleX[i] = rand() % (MAXX - MINX - 1) + MINX;
+                    obstacleY[i] = MINY;
+                    score++; // Score de acordo com a quantidade de obstáculos desviados
+
+                    // Ajusta a velocidade do obstáculo e o intervalo de aparecimento
+                    if (score > 0 && score % 10 == 0 && obstacleSpeed[i] < 3)
+                    {
+                        obstacleSpeed[i] += score / 10 + 1; // Aumenta a velocidade dos obstáculos a cada 10 pontos
+                    }
+                }
+                else
+                {
+                    // Se o obstáculo não atingiu o limite inferior, desenhe-o
+                    screenGotoxy(obstacleX[i], obstacleY[i]);
                     printf(" ");
                 }
-
-                // Reposiciona o obstáculo
-                obstacleX = rand() % (MAXX - MINX - 1) + MINX;
-                obstacleY = MINY;
-                score++; // Score de acordo com a quantidade de obstáculos desviados
-
-                // Ajusta a velocidade do obstáculo e o intervalo de aparecimento
-                if (score > 0 && score % 5 == 0)
-                {
-                    obstacleSpeed += 1;             // Aumenta a velocidade dos obstáculos a cada 5 pontos
-                    obstacleInterval -= (obstacleSpeed > 1) ? 1 : 0; // Reduz o intervalo com velocidade mais alta
-                }
-            }
-            else
-            {
-                // Se o obstáculo não atingiu o limite inferior, desenhe-o
-                screenGotoxy(obstacleX, obstacleY);
-                printf(" ");
             }
 
-            // Verificar colisão com obstáculo
-            if (newBallX == obstacleX && ballY == obstacleY)
+            // Verificar se a bola colidiu com algum obstáculo
+            if (ch == 10)
             {
                 break;
             }
 
             displayScore();
-            printBall(newBallX, ballY);
-            printObstacle(obstacleX, obstacleY);
+            printBall(newBallX, ballY); // Bola nov posiço
+            // Imprimir obstáculos na nova posição
+            for (int i = 0; i < MAX_OBSTACLES; i++)
+            {
+                printObstacle(i, obstacleX[i], obstacleY[i]);
+            }
+
             screenUpdate();
         }
     }
 
-    FILE *file = fopen("scores.txt", "a"); //Abre o arquivo para adicionar a pontuação
+    FILE *file = fopen("scores.txt", "a"); //Abe o arquivo para adicionar a pontuação
     if (file != NULL)
     {
         fprintf(file, "%s: %d\n", playerName, score);
@@ -291,7 +318,7 @@ void displayScore()
     int scorePosX = MAXX - 10; // Ajuste conforme necessário
     int scorePosY = MINY;
 
-    screenSetColor(YELLOW, BLACK); // Escolha a cor desejada
+    screenSetColor(YELLOW, BLACK); // Cor
     screenGotoxy(scorePosX, scorePosY);
     printf("Score: %d", score);
 }
@@ -358,7 +385,6 @@ void displayRanking()
         atual = atual->next;
     }
 
-    // Libera a memória alocada para a lista encadeada
     atual = head;
     while (atual != NULL)
     {
