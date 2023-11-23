@@ -191,7 +191,6 @@ void game()
     }
 
 
-
     keyboardInit();
     timerInit(50);
 
